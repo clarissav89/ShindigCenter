@@ -1,0 +1,99 @@
+@model User
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ActivityCenter</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex ">
+                <ul class="navbar-nav flex-grow-1 flex-sm-row-reverse">
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Logout" class="btn btn-primary">Logout</a>
+                    </li>
+                    <li class="me-3 nav-item">
+                        <h4>Welcome, @Model.name!</h4>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div>
+    <h1>Dojo Activity Center</h1>
+</div>
+<h1>@ViewBag.email</h1>
+<table class="table table-striped">
+    <tr>
+        <th>Activity</th>
+        <th>Date and Time</th>
+        <th>Duration</th>
+        <th>Event Coordinator</th>
+        <th>No. of Participants</th>
+        <th>Actions</th>
+    </tr>
+    @{
+        foreach (Shindig s in ViewBag.allShindigs)
+        {
+            <tr>
+                <td><a href="/oneShindig/@s.shindigId">@s.title</a></td>
+                <td>@s.date.ToShortDateString() at @s.startTime.ToShortTimeString()</td>
+                <td>@s.duration</td>
+                <td>@s.UserRef.name</td>
+                <td>@s.connections.Count</td>
+                @{
+                    // checks for ownership
+                    if (s.userId == Model.userId)
+                    {
+                        <td>
+                            <a href="/delete/@s.shindigId" class="btn btn-warning">Delete</a>
+                        </td>
+
+                    }
+                    else
+                    {
+                        if (s.connections.Count > 0)
+                        {
+                            User_Shindig us = s.connections.Find(c => c.userId == Model.userId);
+                            if (us == null)
+                            {
+                                <td>
+                                    <form action="/join" method="post">
+                                        <input type="submit" value="Join" class="btn btn-primary">
+                                        <input type="hidden" name="userId" Value="@Model.userId">
+                                        <input type="hidden" name="shindigId" Value="@s.shindigId">
+                                    </form>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <form action="/leave" method="post">
+                                        <input type="submit" value="Leave" class="btn btn-primary">
+                                        <input type="hidden" name="user_ShindigId" Value="@us.user_ShindigId">
+                                    </form>
+                                </td>
+                            }
+                        }
+                        else
+                        {
+                            <td>
+                                <form action="/join" method="post">
+                                    <input type="submit" value="Join" class="btn btn-primary">
+                                    <input type="hidden" name="userId" Value="@Model.userId">
+                                    <input type="hidden" name="shindigId" Value="@s.shindigId">
+                                </form>
+                            </td>
+                        }
+                    }
+
+
+                }
+            </tr>
+        }
+    }
+</table>
+<div class="d-flex justify-content-end">
+    <a href="form" class="btn btn-primary">Add New Activity</a>
+</div>

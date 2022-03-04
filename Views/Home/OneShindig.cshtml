@@ -1,0 +1,64 @@
+@model Shindig
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Activity Center</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex ">
+                <ul class="navbar-nav flex-grow-1 flex-sm-row-reverse">
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Logout" class="btn btn-primary">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Dashboard" class="me-1 btn btn-primary">Dashboard</a>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="d-flex justify-content-between">
+    <h1>@Model.title</h1>
+    @{
+        User_Shindig us = Model.connections.Find(c => c.userId == ViewBag.user.userId);
+        if (us == null)
+        {
+            <form action="/join2" method="post">
+                <input type="submit" value="Join" class="btn btn-primary">
+                <input type="hidden" name="userId" Value="@ViewBag.user.userId">
+                <input type="hidden" name="shindigId" Value="@Model.shindigId">
+            </form>
+        }
+        else
+        {
+            <form action="/leave2" method="post">
+                <input type="submit" value="Leave" class="btn btn-primary">
+                <input type="hidden" name="user_ShindigId" Value="@us.user_ShindigId">
+            </form>
+        }
+    }
+
+
+
+
+</div>
+<div class="m-3">
+
+    <h3>Event Coordinator: @Model.UserRef.name</h3>
+    <h3>Description:</h3>
+    <p class="ms-3 me-3">@Model.description</p>
+    <h3 class="mt-3">Participants:</h3>
+    <ul>
+        @{
+            foreach (User_Shindig u in Model.connections)
+            {
+                <h5>@u.User.name</h5>
+            }
+        }
+    </ul>
+
+</div>
